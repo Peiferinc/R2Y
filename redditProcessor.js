@@ -1,9 +1,10 @@
 /*Handle fetching data from Reddit.
 This module can export functions for fetching Reddit posts and generating image slides.
 */
+const fse = require('fs-extra'); // Use fs-extra for directory operations
 const axios = require('axios');
 const subredditURL =
-  'https://www.reddit.com/r/pettyrevenge/top/.json?t=year&limit=10'; // Limit to 10 posts for now
+  'https://www.reddit.com/r/pettyrevenge/top/.json?t=year&limit=2'; // Limit to 10 posts for now
 const puppeteer = require('puppeteer');
 const { loadProcessedData, saveProcessedData } = require('./fileHandler');
 const { splitStoryIntoSlides } = require('./storyProcessor');
@@ -127,20 +128,23 @@ async function generateImageSlides(posts) {
 
     // Translate the story for each language and generate slides
     for (const language of languagePairs) {
-      const { language: languageName, abbreviation } = language;
-      const translatedStory = await translateText(storyText, abbreviation);
+        const { language: languageName, abbreviation } = language;
+        const translatedStory = await translateText(storyText, abbreviation);
+  
+        // Use the same folder name for all languages
+        const storyFolderName = `story_${currentFolderIndex}`;
+        const storyFolderPath = path.join(
+          __dirname,
+          'images',
+          languageName,
+          storyFolderName
+        );
+  
+        // Process each slide of the translated story
+        for (let slideIndex = 0; slideIndex < storySlides.length; slideIndex++) {
+          const slideText = storySlides[slideIndex];
 
-      // Use the same folder name for all languages
-      const storyFolderName = `story_${currentFolderIndex}`;
-      const storyFolderPath = path.join(__dirname, 'images', languageName, storyFolderName);
-
-      if (!fs.existsSync(storyFolderPath)) {
-        fs.mkdirSync(storyFolderPath, { recursive: true });
-      }
-
-      // Process each slide of the translated story
-      for (let slideIndex = 0; slideIndex < storySlides.length; slideIndex++) {
-        const slideText = storySlides[slideIndex];
+          const translatedSlide = await translateText(slideText, abbreviation);
 
         // Construct the screenshot path within the story's folder
         const screenshotPath = path.join(
@@ -148,13 +152,15 @@ async function generateImageSlides(posts) {
           `slide_${slideIndex}.png`
         );
 
+        await fse.ensureDir(storyFolderPath);
+
         const templatePath = path.join(__dirname, 'templates', 'slide.html');
         const page = await browser.newPage();
         await page.goto(`file://${templatePath}`);
 
         await page.evaluate((text) => {
           document.querySelector('.slide p').textContent = text;
-        }, translatedStory);
+        }, translatedSlide);
 
         // Capture a screenshot of the slide with larger dimensions
         const largerScreenshotPath = path.join(
