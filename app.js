@@ -1,7 +1,4 @@
-const axios = require('axios');
-const puppeteer = require('puppeteer');
-const fs = require('fs');
-const path = require('path');
+c
 const { fetchTopRedditPosts, generateImageSlides } = require('./redditProcessor');
 
 // Define constants and other configurations
