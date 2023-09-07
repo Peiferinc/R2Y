@@ -1,4 +1,3 @@
-c
 const { fetchTopRedditPosts, generateImageSlides } = require('./redditProcessor');
 
 // Define constants and other configurations

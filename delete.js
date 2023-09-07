@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Define the directory path to "English"
-const englishDirectoryPath = path.join(__dirname, 'images', 'English');
+const englishDirectoryPath = path.join(__dirname, 'images',);
 
 // Function to recursively delete a directory and its contents
 function deleteFolderRecursive(directoryPath) {

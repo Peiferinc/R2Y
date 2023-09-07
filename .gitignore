@@ -4,6 +4,10 @@ images/
 audio/
 pdf/
 src/
+
+#secret
+reddit2youtube-398320-2584a029b2fe.json
+
 # Logs
 logs
 *.log
